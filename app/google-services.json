@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "422676040689",
+    "project_id": "base-de-datos-firedect",
+    "storage_bucket": "base-de-datos-firedect.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:422676040689:android:312af01bcdf0d854d45250",
+        "android_client_info": {
+          "package_name": "com.example.proyecto1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBooA7nPMjomXT8HEGr2S9OsRWQN3cjGdk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
