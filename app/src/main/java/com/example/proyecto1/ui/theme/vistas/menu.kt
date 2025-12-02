@@ -5,21 +5,26 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.util.Log
-<<<<<<< HEAD
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-=======
->>>>>>> c69e0a2cff359739009f38b63929a33141157c77
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Fireplace
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
@@ -29,91 +34,57 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-<<<<<<< HEAD
-import androidx.compose.foundation.lazy.grid.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.material.icons.filled.Fireplace
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.ui.text.style.TextAlign
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Menu(navController: NavController, database: FirebaseDatabase) {
+    val context = LocalContext.current // Necesario para obtener el contexto
 
-=======
+    var temperatura by remember { mutableStateOf("0") }
+    var humedad by remember { mutableStateOf("0") }
+    var gas by remember { mutableStateOf("0") }
+    var temperaturaMax by remember { mutableStateOf("0") }
+    var incendio_contador by remember { mutableStateOf("0") }
 
-
-@Composable
-fun Menu(navController: NavController, database: FirebaseDatabase) {
-    val context = LocalContext.current
->>>>>>> c69e0a2cff359739009f38b63929a33141157c77
-
-    var temperatura by remember { mutableStateOf("") }
-    var humedad by remember { mutableStateOf("") }
-    var gas by remember { mutableStateOf("") }
-<<<<<<< HEAD
-    var temperaturaMax by remember { mutableStateOf("") }
-    var incendio_contador by remember { mutableStateOf("") }
-
-
+    // Referencias para Firebase
     val buzzerRef = database.getReference("sensores/control_buzzer")
     var estadoBuzzer by remember { mutableStateOf(false) }
 
     val sensoresRef = database.getReference("sensores")
-    //Final
 
+    // Efecto para escuchar cambios en la base de datos
     LaunchedEffect(Unit) {
         sensoresRef.addValueEventListener(object : ValueEventListener {
-=======
-
-    var temperaturaMax by remember { mutableStateOf("") }
-    var incendio_contador by remember { mutableStateOf("") }
-
-    val sensoresRef = database.getReference("sensores") //referenciar mi base de datos de firebase
-
-    LaunchedEffect(Unit) {
-        sensoresRef.addValueEventListener(object  : ValueEventListener {
->>>>>>> c69e0a2cff359739009f38b63929a33141157c77
             override fun onDataChange(snapshot: DataSnapshot) {
                 temperatura = snapshot.child("temperatura").getValue(String::class.java) ?: "0"
                 humedad = snapshot.child("humedad").getValue(String::class.java) ?: "0"
                 gas = snapshot.child("gas").getValue(String::class.java) ?: "0"
                 temperaturaMax = snapshot.child("temperatura_max").getValue(String::class.java) ?: "0"
                 incendio_contador = snapshot.child("incendios_contador").getValue(String::class.java) ?: "0"
-<<<<<<< HEAD
+
+                // Lectura del estado del Buzzer (asumiendo que 1 es activo y 0 es inactivo)
                 val buzzer = snapshot.child("control_buzzer").getValue(Int::class.java) ?: 0
                 estadoBuzzer = buzzer == 1
             }
 
-            override fun onCancelled(error: DatabaseError) {}
-        })
-    }
-
-=======
-            }
-
             override fun onCancelled(error: DatabaseError) {
-                Log.w("Firebase", "Error al momento de leer los archivos", error.toException())
+                Log.e("Firebase", "Error al leer los datos de sensores", error.toException())
             }
         })
     }
 
-
-
->>>>>>> c69e0a2cff359739009f38b63929a33141157c77
+    // --- Estructura principal de la UI (Compose) ---
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF255670))
     ) {
-<<<<<<< HEAD
 
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
 
+            // Encabezado y menú móvil
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -139,37 +110,41 @@ fun Menu(navController: NavController, database: FirebaseDatabase) {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // --- Grid con scroll ---
+            // --- Grid con scroll para los sensores ---
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier
                     .weight(1f)
                     .padding(10.dp),
-                content = {
-                    item { SensorCard("Temperatura", "$temperatura °C", Color(0xFFFFCDD2)) }
-                    item { SensorCard("Humedad", "$humedad %", Color(0xFFBBDEFB)) }
-                    item { SensorCard("Humo", gas, Color(0xFFC8E6C9)) }
-                    item { SensorCard("Temp Máxima", "$temperaturaMax °C", Color(0xFFFFF9C4)) }
-                    item { SensorCard("Incendios", incendio_contador, Color(0xFFD1C4E9)) }
+                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                item { SensorCard("Temperatura", "$temperatura °C", Color(0xFFFFCDD2)) }
+                item { SensorCard("Humedad", "$humedad %", Color(0xFFBBDEFB)) }
+                item { SensorCard("Humo", gas, Color(0xFFC8E6C9)) }
+                item { SensorCard("Temp Máxima", "$temperaturaMax °C", Color(0xFFFFF9C4)) }
+                item { SensorCard("Incendios", incendio_contador, Color(0xFFD1C4E9)) }
 
-                    item(span = { GridItemSpan(2) }) {
-                        BuzzerCard(
-                            estado = estadoBuzzer,
-                            onToggle = { nuevo ->
-                                estadoBuzzer = nuevo
-                                buzzerRef.setValue(if (nuevo) 1 else 0)
-                            }
-                        )
-                    }
+                item(span = { GridItemSpan(2) }) {
+                    BuzzerCard(
+                        estado = estadoBuzzer,
+                        onToggle = { nuevo ->
+                            // Actualiza el estado local y en Firebase
+                            estadoBuzzer = nuevo
+                            buzzerRef.setValue(if (nuevo) 1 else 0)
+                        }
+                    )
                 }
-            )
+            }
 
-
+            // Pie de página
             FooterMenu()
         }
     }
 }
 
+// --- Componentes Composables Auxiliares ---
 
 @Composable
 fun SensorCard(titulo: String, valor: String, colorFondo: Color) {
@@ -179,9 +154,9 @@ fun SensorCard(titulo: String, valor: String, colorFondo: Color) {
         ),
         border = BorderStroke(1.dp, Color.Black),
         modifier = Modifier
-            .width(160.dp)
+            .fillMaxWidth()
             .height(100.dp)
-            .padding(10.dp)
+            .padding(4.dp) // Se reduce el padding para que encaje mejor en el Grid
     ) {
         Column(
             modifier = Modifier
@@ -191,7 +166,7 @@ fun SensorCard(titulo: String, valor: String, colorFondo: Color) {
         ) {
             Text(text = titulo, color = Color.DarkGray, fontSize = 14.sp)
             Spacer(modifier = Modifier.height(5.dp))
-            Text(text = valor, color = Color.Black, fontSize = 20.sp)
+            Text(text = valor, color = Color.Black, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -208,8 +183,8 @@ fun BuzzerCard(
         border = BorderStroke(1.dp, Color.Black),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp)
-            .height(200.dp)
+            .padding(4.dp) // Reducido para el Grid
+            .height(150.dp) // Reducida para que encaje mejor
     ) {
         Column(
             modifier = Modifier.fillMaxSize()
@@ -226,7 +201,8 @@ fun BuzzerCard(
                     Text(
                         if (estado) "Activo" else "Inactivo",
                         fontSize = 20.sp,
-                        color = if (estado) Color.Green else Color.Red
+                        color = if (estado) Color.Green else Color.Red,
+                        fontWeight = FontWeight.Bold
                     )
                 }
 
@@ -236,11 +212,10 @@ fun BuzzerCard(
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
-
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -250,130 +225,15 @@ fun BuzzerCard(
                     fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .width(250.dp)
+                        .fillMaxWidth()
                         .background(Color.White, shape = RoundedCornerShape(12.dp))
-                        .padding(vertical = 12.dp)
+                        .border(1.dp, Color.LightGray, shape = RoundedCornerShape(12.dp))
+                        .padding(vertical = 8.dp)
                 )
             }
         }
     }
-=======
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "FireDect",
-                fontSize = 38.sp,
-                modifier = Modifier
-                    .align(Alignment.Start)
-                    .padding(25.dp)
-            )
-
-            Spacer(modifier = Modifier.height(70.dp))
-
-            Text(
-                text = "Estadísticas en tiempo real",
-                fontSize = 20.sp,
-                color = Color.White
-            )
-            Spacer(modifier = Modifier.height(30.dp))
-
-            Text(
-                text = "Temperatura actual: $temperatura °C  | $humedad",
-                color = Color.Black,
-                fontSize = 16.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .padding(horizontal = 20.dp)
-                    .background(Color.White, shape = RoundedCornerShape(4.dp))
-                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(4.dp))
-                    .padding(horizontal = 16.dp, vertical = 14.dp)
-            )
-            Spacer(modifier = Modifier.height(7.dp))
-            Text(
-                text = "nivel de humo actual actual: $gas",
-                color = Color.Black,
-                fontSize = 16.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .padding(horizontal = 20.dp)
-                    .background(Color.White, shape = RoundedCornerShape(4.dp))
-                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(4.dp))
-                    .padding(horizontal = 16.dp, vertical = 14.dp)
-            )
-            Text(
-                text = "Temperatura normal es 15-30 °C (depende de ciudad/pais)" ,
-                fontSize = 13.sp,
-                color = Color.Cyan
-            )
-            Spacer(modifier = Modifier.height(15.dp))
-
-            Text(
-                text = "Estadísticas criticas",
-                fontSize = 20.sp,
-                color = Color.White
-            )
-
-            Spacer(modifier = Modifier.height(15.dp))
-
-            Text(
-                text = "maximo de temperatura: $temperaturaMax",
-                color = Color.Black,
-                fontSize = 16.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .padding(horizontal = 20.dp)
-                    .background(Color.White, shape = RoundedCornerShape(4.dp))
-                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(4.dp))
-                    .padding(horizontal = 16.dp, vertical = 14.dp)
-            )
-            Spacer(modifier = Modifier.height(7.dp))
-            Text(
-                text = "Excesos térmicos detectados: $incendio_contador",
-                color = Color.Black,
-                fontSize = 16.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .padding(horizontal = 20.dp)
-                    .background(Color.White, shape = RoundedCornerShape(4.dp))
-                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(4.dp))
-                    .padding(horizontal = 16.dp, vertical = 14.dp)
-            )
-            Text(
-                text = "Temperatura muy alta +50 °C (depende de ciudad/pais)" ,
-                fontSize = 13.sp,
-                color = Color.Cyan
-            )
-            Spacer(modifier = Modifier.height(25.dp))
-
-
-            Button(
-                onClick = {
-                    navController.navigate("home")
-                },
-                modifier = Modifier.width(150.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black,
-                )
-            ) {
-                Text(text = "Volver a home")
-            }
-
-            Spacer(modifier = Modifier.height(110.dp))
-            FooterMenu()
-        }
-    }
-
->>>>>>> c69e0a2cff359739009f38b63929a33141157c77
 }
-
-
 
 
 @Composable
@@ -381,7 +241,6 @@ fun FooterMenu() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-<<<<<<< HEAD
             .height(70.dp)
             .background(
                 color = Color(0xFF2E3438),
@@ -422,10 +281,10 @@ fun menu_movil(navController: NavController) {
     var expanded by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(end = 4.dp) // Ajustado el padding para el IconButton
     ) {
         IconButton(onClick = { expanded = !expanded }) {
-            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+            Icon(Icons.Default.MoreVert, contentDescription = "Más opciones", tint = Color.White) // Se agregó color
         }
         DropdownMenu(
             expanded = expanded,
@@ -438,18 +297,7 @@ fun menu_movil(navController: NavController) {
                     expanded = false
                 }
             )
+            // Aquí puedes añadir más ítems del menú si es necesario
         }
-=======
-            .background(Color(0xFF3E4449))
-            .height(50.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "© 2025 FireDect",
-            color = Color.White
-        )
->>>>>>> c69e0a2cff359739009f38b63929a33141157c77
     }
 }
-
-
