@@ -60,10 +60,13 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
     implementation("com.google.firebase:firebase-database")
+<<<<<<< HEAD
     implementation(libs.firebase.firestore)
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.ui.text)
     implementation(libs.material3)
+=======
+>>>>>>> c69e0a2cff359739009f38b63929a33141157c77
     // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -72,7 +75,10 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+<<<<<<< HEAD
     implementation("androidx.compose.material:material-icons-extended:1.6.1")
+=======
+>>>>>>> c69e0a2cff359739009f38b63929a33141157c77
 }
 
 

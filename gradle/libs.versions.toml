@@ -15,10 +15,13 @@ googleGmsGoogleServices = "4.4.4"
 firebaseAuth = "24.0.1"
 foundationLayout = "1.9.4"
 firebaseDatabase = "22.0.1"
+<<<<<<< HEAD
 firebaseFirestore = "26.0.2"
 foundation = "1.9.5"
 uiText = "1.9.5"
 material3 = "1.4.0"
+=======
+>>>>>>> c69e0a2cff359739009f38b63929a33141157c77
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,10 +44,13 @@ firebase-common-ktx = { group = "com.google.firebase", name = "firebase-common-k
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
+<<<<<<< HEAD
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 androidx-ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiText" }
 material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+=======
+>>>>>>> c69e0a2cff359739009f38b63929a33141157c77
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -5,8 +5,11 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.util.Log
+<<<<<<< HEAD
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+=======
+>>>>>>> c69e0a2cff359739009f38b63929a33141157c77
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -26,6 +29,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+<<<<<<< HEAD
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.ui.draw.shadow
@@ -38,10 +42,18 @@ import androidx.compose.ui.text.style.TextAlign
 @Composable
 fun Menu(navController: NavController, database: FirebaseDatabase) {
 
+=======
+
+
+@Composable
+fun Menu(navController: NavController, database: FirebaseDatabase) {
+    val context = LocalContext.current
+>>>>>>> c69e0a2cff359739009f38b63929a33141157c77
 
     var temperatura by remember { mutableStateOf("") }
     var humedad by remember { mutableStateOf("") }
     var gas by remember { mutableStateOf("") }
+<<<<<<< HEAD
     var temperaturaMax by remember { mutableStateOf("") }
     var incendio_contador by remember { mutableStateOf("") }
 
@@ -54,12 +66,23 @@ fun Menu(navController: NavController, database: FirebaseDatabase) {
 
     LaunchedEffect(Unit) {
         sensoresRef.addValueEventListener(object : ValueEventListener {
+=======
+
+    var temperaturaMax by remember { mutableStateOf("") }
+    var incendio_contador by remember { mutableStateOf("") }
+
+    val sensoresRef = database.getReference("sensores") //referenciar mi base de datos de firebase
+
+    LaunchedEffect(Unit) {
+        sensoresRef.addValueEventListener(object  : ValueEventListener {
+>>>>>>> c69e0a2cff359739009f38b63929a33141157c77
             override fun onDataChange(snapshot: DataSnapshot) {
                 temperatura = snapshot.child("temperatura").getValue(String::class.java) ?: "0"
                 humedad = snapshot.child("humedad").getValue(String::class.java) ?: "0"
                 gas = snapshot.child("gas").getValue(String::class.java) ?: "0"
                 temperaturaMax = snapshot.child("temperatura_max").getValue(String::class.java) ?: "0"
                 incendio_contador = snapshot.child("incendios_contador").getValue(String::class.java) ?: "0"
+<<<<<<< HEAD
                 val buzzer = snapshot.child("control_buzzer").getValue(Int::class.java) ?: 0
                 estadoBuzzer = buzzer == 1
             }
@@ -68,11 +91,24 @@ fun Menu(navController: NavController, database: FirebaseDatabase) {
         })
     }
 
+=======
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("Firebase", "Error al momento de leer los archivos", error.toException())
+            }
+        })
+    }
+
+
+
+>>>>>>> c69e0a2cff359739009f38b63929a33141157c77
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF255670))
     ) {
+<<<<<<< HEAD
 
         Column(
             modifier = Modifier.fillMaxSize()
@@ -221,6 +257,120 @@ fun BuzzerCard(
             }
         }
     }
+=======
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "FireDect",
+                fontSize = 38.sp,
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(25.dp)
+            )
+
+            Spacer(modifier = Modifier.height(70.dp))
+
+            Text(
+                text = "Estadísticas en tiempo real",
+                fontSize = 20.sp,
+                color = Color.White
+            )
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Text(
+                text = "Temperatura actual: $temperatura °C  | $humedad",
+                color = Color.Black,
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .padding(horizontal = 20.dp)
+                    .background(Color.White, shape = RoundedCornerShape(4.dp))
+                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(4.dp))
+                    .padding(horizontal = 16.dp, vertical = 14.dp)
+            )
+            Spacer(modifier = Modifier.height(7.dp))
+            Text(
+                text = "nivel de humo actual actual: $gas",
+                color = Color.Black,
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .padding(horizontal = 20.dp)
+                    .background(Color.White, shape = RoundedCornerShape(4.dp))
+                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(4.dp))
+                    .padding(horizontal = 16.dp, vertical = 14.dp)
+            )
+            Text(
+                text = "Temperatura normal es 15-30 °C (depende de ciudad/pais)" ,
+                fontSize = 13.sp,
+                color = Color.Cyan
+            )
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Text(
+                text = "Estadísticas criticas",
+                fontSize = 20.sp,
+                color = Color.White
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Text(
+                text = "maximo de temperatura: $temperaturaMax",
+                color = Color.Black,
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .padding(horizontal = 20.dp)
+                    .background(Color.White, shape = RoundedCornerShape(4.dp))
+                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(4.dp))
+                    .padding(horizontal = 16.dp, vertical = 14.dp)
+            )
+            Spacer(modifier = Modifier.height(7.dp))
+            Text(
+                text = "Excesos térmicos detectados: $incendio_contador",
+                color = Color.Black,
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .padding(horizontal = 20.dp)
+                    .background(Color.White, shape = RoundedCornerShape(4.dp))
+                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(4.dp))
+                    .padding(horizontal = 16.dp, vertical = 14.dp)
+            )
+            Text(
+                text = "Temperatura muy alta +50 °C (depende de ciudad/pais)" ,
+                fontSize = 13.sp,
+                color = Color.Cyan
+            )
+            Spacer(modifier = Modifier.height(25.dp))
+
+
+            Button(
+                onClick = {
+                    navController.navigate("home")
+                },
+                modifier = Modifier.width(150.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black,
+                )
+            ) {
+                Text(text = "Volver a home")
+            }
+
+            Spacer(modifier = Modifier.height(110.dp))
+            FooterMenu()
+        }
+    }
+
+>>>>>>> c69e0a2cff359739009f38b63929a33141157c77
 }
 
 
@@ -231,6 +381,7 @@ fun FooterMenu() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
+<<<<<<< HEAD
             .height(70.dp)
             .background(
                 color = Color(0xFF2E3438),
@@ -288,6 +439,16 @@ fun menu_movil(navController: NavController) {
                 }
             )
         }
+=======
+            .background(Color(0xFF3E4449))
+            .height(50.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "© 2025 FireDect",
+            color = Color.White
+        )
+>>>>>>> c69e0a2cff359739009f38b63929a33141157c77
     }
 }
 
