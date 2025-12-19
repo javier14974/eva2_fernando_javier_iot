@@ -6,13 +6,3 @@ import androidx.compose.runtime.Composable
 
 private val LightColors = lightColorScheme()
 
-@Composable
-fun Proyecto1Theme(
-    content: @Composable () -> Unit
-) {
-    MaterialTheme(
-        colorScheme = LightColors,
-        typography = Typography, // ahora es material3.Typography
-        content = content
-    )
-}

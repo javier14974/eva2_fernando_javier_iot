@@ -53,18 +53,18 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
-
-    implementation(libs.firebase.auth)
-    implementation(libs.androidx.foundation.layout)
-    implementation(libs.firebase.database)
-
-    implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
-    implementation("com.google.firebase:firebase-database")
-    implementation(libs.firebase.firestore)
     implementation(libs.androidx.foundation)
+    implementation(libs.androidx.foundation.layout)
     implementation(libs.androidx.ui.text)
-    implementation(libs.material3)
-    // Test
+
+    // Firebase (BOM recomendado)
+    implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.database)
+    implementation(libs.firebase.firestore)
+    implementation("androidx.compose.material:material-icons-extended:1.6.1")
+
+    // Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -72,7 +72,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation("androidx.compose.material:material-icons-extended:1.6.1")
 }
-
-

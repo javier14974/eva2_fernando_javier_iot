@@ -1,5 +1,6 @@
 package com.example.proyecto1.ui.theme.vistas
 
+import android.R
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -34,100 +35,101 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material.icons.filled.Fireplace
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.ui.text.style.TextAlign
+
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Menu(navController: NavController, database: FirebaseDatabase) {
 
-
-    var temperatura by remember { mutableStateOf("") }
-    var humedad by remember { mutableStateOf("") }
-    var gas by remember { mutableStateOf("") }
-    var temperaturaMax by remember { mutableStateOf("") }
-    var incendio_contador by remember { mutableStateOf("") }
-
-
-    val buzzerRef = database.getReference("sensores/control_buzzer")
-    var estadoBuzzer by remember { mutableStateOf(false) }
-
+    val context = LocalContext.current
     val sensoresRef = database.getReference("sensores")
-    //Final
+    val buzzerRef = database.getReference("sensores/control_buzzer")
+
+    var temperatura by remember { mutableStateOf("0") }
+    var humedad by remember { mutableStateOf("0") }
+    var gas by remember { mutableStateOf("0") }
+    var temperaturaMax by remember { mutableStateOf("0") }
+    var incendio by remember { mutableStateOf("0") }
+    var estadoBuzzer by remember { mutableStateOf(false) }
+    var notificado by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         sensoresRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                temperatura = snapshot.child("temperatura").getValue(String::class.java) ?: "0"
-                humedad = snapshot.child("humedad").getValue(String::class.java) ?: "0"
-                gas = snapshot.child("gas").getValue(String::class.java) ?: "0"
-                temperaturaMax = snapshot.child("temperatura_max").getValue(String::class.java) ?: "0"
-                incendio_contador = snapshot.child("incendios_contador").getValue(String::class.java) ?: "0"
-                val buzzer = snapshot.child("control_buzzer").getValue(Int::class.java) ?: 0
-                estadoBuzzer = buzzer == 1
+                temperatura = snapshot.child("temperatura").getValue(Float::class.java)?.toString() ?: "0"
+                humedad = snapshot.child("humedad").getValue(Float::class.java)?.toString() ?: "0"
+                gas = snapshot.child("gas").getValue(Int::class.java)?.toString() ?: "0"
+                temperaturaMax = snapshot.child("temperatura_max").getValue(Float::class.java)?.toString() ?: "0"
+                incendio = snapshot.child("incendio").getValue(Int::class.java)?.toString() ?: "0"
+                estadoBuzzer = (snapshot.child("control_buzzer").getValue(Int::class.java) ?: 0) == 1
             }
-
             override fun onCancelled(error: DatabaseError) {}
         })
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF255670))
-    ) {
+    LaunchedEffect(incendio) {
+        if (incendio == "1" && !notificado) {
+            val builder = NotificationCompat.Builder(context, "fire_alerts")
+                .setSmallIcon(R.drawable.ic_dialog_alert)
+                .setContentTitle("Incendio detectado!")
+                .setContentText("Se ha detectado un incendio")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+            NotificationManagerCompat.from(context).notify(1001, builder.build())
+            notificado = true
+        } else if (incendio == "0") notificado = false
+    }
 
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
+    Box(
+        modifier = Modifier.fillMaxSize().background(Color(0xFF255670))
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth().padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "FireDect",
-                    fontSize = 38.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                menu_movil(navController = navController)
+                Text("FireDect", fontSize = 38.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                menu_movil(navController)
             }
 
             Text(
-                text = "Estadísticas en tiempo real",
+                "Estadísticas en tiempo real",
                 fontSize = 22.sp,
                 color = Color.White,
                 modifier = Modifier.padding(start = 20.dp)
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(Modifier.height(10.dp))
 
-            // --- Grid con scroll ---
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(10.dp),
-                content = {
-                    item { SensorCard("Temperatura", "$temperatura °C", Color(0xFFFFCDD2)) }
-                    item { SensorCard("Humedad", "$humedad %", Color(0xFFBBDEFB)) }
-                    item { SensorCard("Humo", gas, Color(0xFFC8E6C9)) }
-                    item { SensorCard("Temp Máxima", "$temperaturaMax °C", Color(0xFFFFF9C4)) }
-                    item { SensorCard("Incendios", incendio_contador, Color(0xFFD1C4E9)) }
-
-                    item(span = { GridItemSpan(2) }) {
-                        BuzzerCard(
-                            estado = estadoBuzzer,
-                            onToggle = { nuevo ->
-                                estadoBuzzer = nuevo
-                                buzzerRef.setValue(if (nuevo) 1 else 0)
-                            }
-                        )
-                    }
+                modifier = Modifier.weight(1f).background(Color(0xFF255670)),
+                contentPadding = PaddingValues(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                item { SensorCard("Temperatura", "$temperatura °C", Color(0xFFFFCDD2)) }
+                item { SensorCard("Humedad", "$humedad %", Color(0xFFBBDEFB)) }
+                item { SensorCard("Humo", gas, Color(0xFFC8E6C9)) }
+                item { SensorCard("Temp Máxima", "$temperaturaMax °C", Color(0xFFFFF9C4)) }
+                item {
+                    SensorCard(
+                        "Incendio",
+                        if (incendio == "1") "Incendio ACTIVO" else "Sin riesgo",
+                        if (incendio == "1") Color(0xFFFF8A80) else Color(0xFFD1C4E9)
+                    )
                 }
-            )
-
+                item(span = { GridItemSpan(2) }) {
+                    BuzzerCard(
+                        estado = estadoBuzzer,
+                        onToggle = { nuevo ->
+                            estadoBuzzer = nuevo
+                            buzzerRef.setValue(if (nuevo) 1 else 0)
+                        }
+                    )
+                }
+            }
 
             FooterMenu()
         }
@@ -135,27 +137,23 @@ fun Menu(navController: NavController, database: FirebaseDatabase) {
 }
 
 
+
+
 @Composable
 fun SensorCard(titulo: String, valor: String, colorFondo: Color) {
+    val currentValor by rememberUpdatedState(valor)
     OutlinedCard(
-        colors = CardDefaults.cardColors(
-            containerColor = colorFondo
-        ),
+        colors = CardDefaults.cardColors(containerColor = colorFondo),
         border = BorderStroke(1.dp, Color.Black),
-        modifier = Modifier
-            .width(160.dp)
-            .height(100.dp)
-            .padding(10.dp)
+        modifier = Modifier.width(160.dp).height(100.dp).padding(10.dp)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(10.dp),
+            modifier = Modifier.fillMaxSize().padding(10.dp),
             verticalArrangement = Arrangement.Center
         ) {
             Text(text = titulo, color = Color.DarkGray, fontSize = 14.sp)
-            Spacer(modifier = Modifier.height(5.dp))
-            Text(text = valor, color = Color.Black, fontSize = 20.sp)
+            Spacer(Modifier.height(5.dp))
+            Text(text = currentValor, color = Color.Black, fontSize = 20.sp)
         }
     }
 }
@@ -165,56 +163,46 @@ fun BuzzerCard(
     estado: Boolean,
     onToggle: (Boolean) -> Unit
 ) {
+    val currentEstado by rememberUpdatedState(estado)
     OutlinedCard(
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFE082)
-        ),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFE082)),
         border = BorderStroke(1.dp, Color.Black),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp)
-            .height(200.dp)
+        modifier = Modifier.fillMaxWidth().padding(10.dp).height(200.dp)
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(14.dp),
+                modifier = Modifier.fillMaxWidth().padding(14.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
                     Text("Buzzer", fontSize = 16.sp, color = Color.DarkGray)
                     Text(
-                        if (estado) "Activo" else "Inactivo",
+                        if (currentEstado) "Activo" else "Inactivo",
                         fontSize = 20.sp,
-                        color = if (estado) Color.Green else Color.Red
+                        color = if (currentEstado) Color.Green else Color.Red
                     )
                 }
 
                 Switch(
-                    checked = estado,
+                    checked = currentEstado,
                     onCheckedChange = onToggle
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(Modifier.height(10.dp))
 
             Box(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Control de la alarma de incendio",
+                    text = "⚠ Alarma de incendio(ADVERTENCIA DESACTIVANDO LA ALARMA NO SONARA EN RIESGO DE INCENDIO)",
                     color = Color.Black,
-                    fontSize = 16.sp,
+                    fontSize = 10.sp,
                     fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .width(250.dp)
+                    modifier = Modifier.width(250.dp)
                         .background(Color.White, shape = RoundedCornerShape(12.dp))
                         .padding(vertical = 12.dp)
                 )
@@ -223,45 +211,18 @@ fun BuzzerCard(
     }
 }
 
-
-
-
 @Composable
 fun FooterMenu() {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(70.dp)
-            .background(
-                color = Color(0xFF2E3438),
-                shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)
-            )
-            .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)
-            ),
+        modifier = Modifier.fillMaxWidth().height(70.dp)
+            .background(Color(0xFF2E3438), shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp))
+            .shadow(8.dp, RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)),
         contentAlignment = Alignment.Center
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-
-            Icon(
-                imageVector = Icons.Default.Fireplace,
-                contentDescription = null,
-                tint = Color(0xFFFF7043),
-                modifier = Modifier.size(22.dp)
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Text(
-                text = "FireDect • 2025",
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold
-            )
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+            Icon(Icons.Default.Fireplace, contentDescription = null, tint = Color(0xFFFF7043), modifier = Modifier.size(22.dp))
+            Spacer(Modifier.width(8.dp))
+            Text("FireDect • 2025", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }
@@ -269,17 +230,11 @@ fun FooterMenu() {
 @Composable
 fun menu_movil(navController: NavController) {
     var expanded by remember { mutableStateOf(false) }
-    Box(
-        modifier = Modifier
-            .padding(16.dp)
-    ) {
+    Box(modifier = Modifier.padding(16.dp)) {
         IconButton(onClick = { expanded = !expanded }) {
             Icon(Icons.Default.MoreVert, contentDescription = "More options")
         }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             DropdownMenuItem(
                 text = { Text("Home") },
                 onClick = {
@@ -290,5 +245,6 @@ fun menu_movil(navController: NavController) {
         }
     }
 }
+
 
 
