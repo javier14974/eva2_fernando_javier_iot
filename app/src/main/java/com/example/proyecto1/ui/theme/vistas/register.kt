@@ -26,18 +26,41 @@ import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun Register(navController: NavController, auth: FirebaseAuth) {
+
+    // Variables para guardar los datos ingresados por el usuario
     var nombre_nuevo by remember { mutableStateOf("") }
     var correo_nuevo by remember { mutableStateOf("") }
     var contra_nuevo by remember { mutableStateOf("") }
     var contra_confirmar_nuevo by remember { mutableStateOf("") }
+
+    // Contexto necesario para mostrar mensajes Toast
     val context = LocalContext.current
 
-    Box(modifier = Modifier.fillMaxSize().background(Color(0xFF255670))) {
-        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
+    // Contenedor principal
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF255670))
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp)
+        ) {
+
             Spacer(Modifier.height(50.dp))
-            Text("FireDect", fontSize = 38.sp, fontWeight = FontWeight.Bold, color = Color.White)
+
+            // Título de la app
+            Text(
+                "FireDect",
+                fontSize = 38.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+
             Spacer(Modifier.height(20.dp))
 
+            // Tarjeta con el formulario de registro
             Card(
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier.fillMaxWidth(),
@@ -45,12 +68,23 @@ fun Register(navController: NavController, auth: FirebaseAuth) {
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Registrar Usuario", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFF00796B))
+
+                    // Título del formulario
+                    Text(
+                        "Registrar Usuario",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF00796B)
+                    )
+
                     Spacer(Modifier.height(20.dp))
 
+                    // Campo nombre
                     val currentNombre by rememberUpdatedState(nombre_nuevo)
                     OutlinedTextField(
                         value = currentNombre,
@@ -66,8 +100,10 @@ fun Register(navController: NavController, auth: FirebaseAuth) {
                         )
                     )
 
-                    val currentCorreo by rememberUpdatedState(correo_nuevo)
                     Spacer(Modifier.height(16.dp))
+
+                    // Campo correo
+                    val currentCorreo by rememberUpdatedState(correo_nuevo)
                     OutlinedTextField(
                         value = currentCorreo,
                         onValueChange = { correo_nuevo = it },
@@ -83,8 +119,10 @@ fun Register(navController: NavController, auth: FirebaseAuth) {
                         )
                     )
 
-                    val currentContra by rememberUpdatedState(contra_nuevo)
                     Spacer(Modifier.height(16.dp))
+
+                    // Campo contraseña
+                    val currentContra by rememberUpdatedState(contra_nuevo)
                     OutlinedTextField(
                         value = currentContra,
                         onValueChange = { contra_nuevo = it },
@@ -101,8 +139,10 @@ fun Register(navController: NavController, auth: FirebaseAuth) {
                         )
                     )
 
-                    val currentConfirm by rememberUpdatedState(contra_confirmar_nuevo)
                     Spacer(Modifier.height(16.dp))
+
+                    // Campo confirmar contraseña
+                    val currentConfirm by rememberUpdatedState(contra_confirmar_nuevo)
                     OutlinedTextField(
                         value = currentConfirm,
                         onValueChange = { contra_confirmar_nuevo = it },
@@ -120,31 +160,58 @@ fun Register(navController: NavController, auth: FirebaseAuth) {
                     )
 
                     Spacer(Modifier.height(24.dp))
+
+                    // Botón para registrar al usuario
                     Button(
-                        onClick = { validarRegistro(currentNombre, currentCorreo, currentContra, currentConfirm, auth, context, navController) },
+                        onClick = {
+                            validarRegistro(
+                                currentNombre,
+                                currentCorreo,
+                                currentContra,
+                                currentConfirm,
+                                auth,
+                                context,
+                                navController
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00796B), contentColor = Color.White),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF00796B),
+                            contentColor = Color.White
+                        ),
                         shape = RoundedCornerShape(12.dp)
-                    ) { Text("Enviar datos", fontSize = 18.sp) }
+                    ) {
+                        Text("Enviar datos", fontSize = 18.sp)
+                    }
 
                     Spacer(Modifier.height(16.dp))
+
+                    // Botón para volver al login
                     Button(
                         onClick = { navController.navigate("login") },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50), contentColor = Color.White),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF4CAF50),
+                            contentColor = Color.White
+                        ),
                         shape = RoundedCornerShape(12.dp)
-                    ) { Text("Volver a Login", fontSize = 18.sp) }
+                    ) {
+                        Text("Volver a Login", fontSize = 18.sp)
+                    }
 
                     Spacer(Modifier.height(10.dp))
                 }
             }
 
             Spacer(Modifier.weight(1f))
+
+            // Footer inferior
             Footer_register()
         }
     }
 }
 
+// Función que valida los datos antes de registrar al usuario
 private fun validarRegistro(
     nombreNuevo: String,
     correoNuevo: String,
@@ -154,22 +221,38 @@ private fun validarRegistro(
     context: Context,
     navController: NavController
 ) {
+
+    // Validaciones básicas del formulario
     when {
-        correoNuevo.isBlank() || nombreNuevo.isBlank() || contraNuevo.isBlank() || contraConfirmarNuevo.isBlank() ->
+        correoNuevo.isBlank() || nombreNuevo.isBlank() ||
+                contraNuevo.isBlank() || contraConfirmarNuevo.isBlank() ->
             Toast.makeText(context, "Por favor rellenar todos los campos", Toast.LENGTH_SHORT).show()
+
         contraNuevo != contraConfirmarNuevo ->
             Toast.makeText(context, "Deben ser iguales las 2 contraseñas", Toast.LENGTH_SHORT).show()
+
         !Patterns.EMAIL_ADDRESS.matcher(correoNuevo).matches() ->
             Toast.makeText(context, "Correo inválido", Toast.LENGTH_SHORT).show()
+
         contraNuevo.length !in 6..10 ->
-            Toast.makeText(context, "La contraseña debe tener entre 6 y 10 caracteres", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                context,
+                "La contraseña debe tener entre 6 y 10 caracteres",
+                Toast.LENGTH_SHORT
+            ).show()
+
         else ->
             auth.createUserWithEmailAndPassword(correoNuevo, contraNuevo)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
+
+                        // Registro exitoso
                         Toast.makeText(context, "Registro exitoso", Toast.LENGTH_SHORT).show()
                         navController.navigate("login")
+
                     } else {
+
+                        // Error en el registro
                         Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -178,13 +261,23 @@ private fun validarRegistro(
 
 @Composable
 fun Footer_register() {
+
+    // Footer con el nombre del proyecto
     Box(
-        modifier = Modifier.fillMaxWidth().height(70.dp)
-            .background(Color(0xFF2E3438), shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp))
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(70.dp)
+            .background(
+                Color(0xFF2E3438),
+                shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)
+            )
             .shadow(8.dp, RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)),
         contentAlignment = Alignment.Center
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
             Icon(
                 imageVector = Icons.Default.Fireplace,
                 contentDescription = null,
@@ -192,7 +285,12 @@ fun Footer_register() {
                 modifier = Modifier.size(22.dp)
             )
             Spacer(Modifier.width(8.dp))
-            Text("FireDect • 2025", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            Text(
+                "FireDect • 2025",
+                color = Color.White,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold
+            )
         }
     }
 }

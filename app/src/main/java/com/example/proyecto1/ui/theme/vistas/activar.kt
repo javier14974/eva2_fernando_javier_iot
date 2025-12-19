@@ -19,25 +19,30 @@ import com.google.firebase.database.*
 @Composable
 fun Activar(navController: NavController) {
 
+    // Referencia a Firebase, específicamente al valor que controla el buzzer
     val dbRef = FirebaseDatabase.getInstance().reference
         .child("sensores")
         .child("control_buzzer")
 
-    // Estado interno que refleja el valor del buzzer (true = 1, false = 0)
+    // Variable que guarda si el buzzer está activo o no dentro de la app
     var estadoBuzzer by remember { mutableStateOf(false) }
 
-    // Escuchar cambios en tiempo real
+    // Se queda escuchando cambios en Firebase en tiempo real
     LaunchedEffect(Unit) {
         dbRef.addValueEventListener(object : ValueEventListener {
+
+            // Cada vez que cambia el valor en Firebase
             override fun onDataChange(snapshot: DataSnapshot) {
                 val valor = snapshot.getValue(Int::class.java) ?: 0
-                estadoBuzzer = valor == 1        // convierte 1 → true
+                estadoBuzzer = valor == 1   // si es 1 → activo, si es 0 → apagado
             }
 
+            // Si ocurre un error (no se maneja nada acá)
             override fun onCancelled(error: DatabaseError) {}
         })
     }
 
+    // Contenedor principal de la pantalla
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -50,6 +55,7 @@ fun Activar(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+            // Título de la pantalla
             Text(
                 text = "Control de Buzzer",
                 color = Color.White,
@@ -58,10 +64,12 @@ fun Activar(navController: NavController) {
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // ------------------ SWITCH ------------------
+            // -------- SWITCH PARA ACTIVAR O DESACTIVAR --------
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
+                // Texto que indica el estado actual
                 Text(
                     text = if (estadoBuzzer) "Activo" else "Inactivo",
                     color = Color.White,
@@ -69,10 +77,12 @@ fun Activar(navController: NavController) {
                     modifier = Modifier.padding(end = 12.dp)
                 )
 
+                // Switch que cambia el valor del buzzer
                 Switch(
                     checked = estadoBuzzer,
                     onCheckedChange = { nuevoEstado ->
                         estadoBuzzer = nuevoEstado
+                        // Se envía el nuevo valor a Firebase
                         dbRef.setValue(if (nuevoEstado) 1 else 0)
                     }
                 )
@@ -80,7 +90,7 @@ fun Activar(navController: NavController) {
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // ----------- ESTADO EN VIVO -----------
+            // -------- ESTADO EN TIEMPO REAL --------
             Text(
                 text = if (estadoBuzzer) "BUZZER PRENDIDO" else "BUZZER APAGADO",
                 color = if (estadoBuzzer) Color.Green else Color.Red,
@@ -89,4 +99,3 @@ fun Activar(navController: NavController) {
         }
     }
 }
-
